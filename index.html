@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent1: #22c55e; /* physisch */
+      --accent2: #a855f7; /* psychisch */
+      --accent3: #3b82f6; /* mental */
+      --accent4: #f59e0b; /* habits */
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 1rem;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 0.5rem 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    input, textarea {
+      width: 100%;
+      background: #020617;
+      border: 1px solid #1f2933;
+      border-radius: 10px;
+      padding: 0.5rem;
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .section {
+      margin-top: 0.75rem;
+    }
+
+    .physisch { border-left: 4px solid var(--accent1); padding-left: 0.5rem; }
+    .psychisch { border-left: 4px solid var(--accent2); padding-left: 0.5rem; }
+    .mental { border-left: 4px solid var(--accent3); padding-left: 0.5rem; }
+    .habits { border-left: 4px solid var(--accent4); padding-left: 0.5rem; }
+
+    .footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 700px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="card header">
+      <div>
+        <h1>Guten Abend 👋</h1>
+        <div class="muted">Dein persönliches Daily Dashboard</div>
+      </div>
+      <div class="badge">Safari-ready</div>
+    </div>
+
+    <!-- Quick Overview -->
+    <div class="grid-2">
+      <div class="card habits">
+        <h2>Gewohnheiten</h2>
+        <label><input type="checkbox" /> Bewegung</label><br />
+        <label><input type="checkbox" /> Lesen</label><br />
+        <label><input type="checkbox" /> Fokuszeit</label><br />
+        <label><input type="checkbox" /> Schlafroutine</label>
+      </div>
+
+      <div class="card">
+        <h2>Aktuelles Buch</h2>
+        <input placeholder="Buchtitel" />
+        <input placeholder="Autor" style="margin-top:0.5rem" />
+        <textarea placeholder="Gedanken / Zitate" style="margin-top:0.5rem"></textarea>
+      </div>
+    </div>
+
+    <!-- Evening Reflection -->
+    <div class="card">
+      <h2>🌙 Abend-Reflexion</h2>
+
+      <div class="section physisch">
+        <h3>Physisch</h3>
+        <input placeholder="Energie (1–10)" />
+        <textarea placeholder="Körpergefühl, Bewegung, Schlaf"></textarea>
+      </div>
+
+      <div class="section psychisch">
+        <h3>Psychisch</h3>
+        <textarea placeholder="Emotionen & innere Stimmung"></textarea>
+      </div>
+
+      <div class="section mental">
+        <h3>Mental</h3>
+        <input placeholder="Fokus (1–10)" />
+        <textarea placeholder="Gedanken, Klarheit, loslassen"></textarea>
+      </div>
+    </div>
+
+    <div class="footer">Built for dich · Offline nutzbar · Erweiterbar 🚀</div>
+
+  </div>
+</body>
+</html>
