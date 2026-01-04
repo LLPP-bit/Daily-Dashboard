@@ -1,166 +1,629 @@
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daily Dashboard</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card: #111827;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --accent1: #22c55e; /* physisch */
-      --accent2: #a855f7; /* psychisch */
-      --accent3: #3b82f6; /* mental */
-      --accent4: #f59e0b; /* habits */
+    :root{
+      --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#9ca3af;
+      --accent1:#22c55e; /* physisch */
+      --accent2:#a855f7; /* psychisch */
+      --accent3:#3b82f6; /* mental */
+      --accent4:#f59e0b; /* habits */
+      --line:#1f2933;
+      --input:#020617;
+    }
+    *{ box-sizing:border-box; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    body{ margin:0; background:var(--bg); color:var(--text); padding:1rem; }
+    h1,h2,h3{ margin:0 0 .5rem 0; }
+    .muted{ color:var(--muted); font-size:.9rem; }
+    .container{ max-width:1100px; margin:auto; display:grid; grid-template-columns:1.2fr .8fr; gap:1rem; }
+    .card{ background:var(--card); border-radius:16px; padding:1rem; box-shadow:0 10px 25px rgba(0,0,0,.25); }
+    .header{ display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+    .badge{ font-size:.75rem; padding:.25rem .5rem; border-radius:999px; background:rgba(255,255,255,.1); white-space:nowrap; }
+    .btn{
+      cursor:pointer; border:1px solid var(--line); background:rgba(255,255,255,.06);
+      color:var(--text); padding:.55rem .75rem; border-radius:12px;
+    }
+    .btn:hover{ background:rgba(255,255,255,.10); }
+    .btn.primary{ border-color:rgba(245,158,11,.45); background:rgba(245,158,11,.14); }
+    .btn.primary:hover{ background:rgba(245,158,11,.20); }
+
+    input, textarea, select{
+      width:100%; background:var(--input); border:1px solid var(--line);
+      border-radius:10px; padding:.5rem; color:var(--text);
+    }
+    textarea{ min-height:90px; resize:vertical; }
+    label{ display:flex; gap:.6rem; align-items:flex-start; margin:.45rem 0; }
+    label input[type="checkbox"]{ width:18px; height:18px; margin-top:.15rem; }
+
+    .split{ display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; }
+    .pill{
+      font-size:.75rem; padding:.25rem .5rem; border-radius:999px;
+      border:1px solid var(--line); color:var(--muted); background:rgba(255,255,255,.04);
     }
 
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+    .section{ margin-top:.75rem; }
+
+    .physisch{ border-left:4px solid var(--accent1); padding-left:.5rem; }
+    .psychisch{ border-left:4px solid var(--accent2); padding-left:.5rem; }
+    .mental{ border-left:4px solid var(--accent3); padding-left:.5rem; }
+    .habits{ border-left:4px solid var(--accent4); padding-left:.5rem; }
+
+    .row{ display:flex; justify-content:space-between; align-items:center; gap:.75rem; }
+    .small{ font-size:.85rem; color:var(--muted); }
+    .divider{ height:1px; background:rgba(255,255,255,.08); margin:.8rem 0; border-radius:999px; }
+
+    .progress-wrap{ margin:.5rem 0 .25rem 0; }
+    .bar{
+      width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.08);
+      overflow:hidden; border:1px solid rgba(255,255,255,.10);
     }
+    .fill{ height:100%; width:0%; background:rgba(245,158,11,.80); border-radius:999px; }
+    .fill.green{ background:rgba(34,197,94,.80); }
+    .fill.purple{ background:rgba(168,85,247,.80); }
+    .fill.blue{ background:rgba(59,130,246,.80); }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      padding: 1rem;
+    .history-list{ display:flex; flex-direction:column; gap:.5rem; }
+    .history-item{
+      border:1px solid var(--line); background:rgba(255,255,255,.04);
+      border-radius:12px; padding:.6rem .7rem; cursor:pointer;
     }
+    .history-item:hover{ background:rgba(255,255,255,.08); }
+    .history-item.active{ outline:2px solid rgba(245,158,11,.35); }
+    .history-meta{ display:flex; justify-content:space-between; gap:.75rem; }
+    .footer{ text-align:center; font-size:.75rem; color:var(--muted); margin-top:1rem; grid-column:1 / -1; }
 
-    h1, h2, h3 {
-      margin: 0 0 0.5rem 0;
+    @media (max-width: 980px){
+      .container{ grid-template-columns:1fr; }
     }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 1rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    .badge {
-      font-size: 0.75rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.1);
-    }
-
-    input, textarea {
-      width: 100%;
-      background: #020617;
-      border: 1px solid #1f2933;
-      border-radius: 10px;
-      padding: 0.5rem;
-      color: var(--text);
-    }
-
-    textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .section {
-      margin-top: 0.75rem;
-    }
-
-    .physisch { border-left: 4px solid var(--accent1); padding-left: 0.5rem; }
-    .psychisch { border-left: 4px solid var(--accent2); padding-left: 0.5rem; }
-    .mental { border-left: 4px solid var(--accent3); padding-left: 0.5rem; }
-    .habits { border-left: 4px solid var(--accent4); padding-left: 0.5rem; }
-
-    .footer {
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 2rem;
-    }
-
-    @media (max-width: 700px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 820px){
+      .grid-3{ grid-template-columns:1fr; }
+      .grid-2{ grid-template-columns:1fr; }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
 
-    <!-- Header -->
-    <div class="card header">
-      <div>
-        <h1>Guten Abend 👋</h1>
-        <div class="muted">Dein persönliches Daily Dashboard</div>
+    <!-- LEFT: Main -->
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+
+      <!-- Header -->
+      <div class="card header">
+        <div>
+          <h1>Guten Abend 👋</h1>
+          <div class="muted">
+            <span id="datePretty">—</span> · <span class="pill" id="dayKeyPill">—</span>
+          </div>
+        </div>
+
+        <div class="split" style="justify-content:flex-end;">
+          <div style="min-width:220px;">
+            <div class="small" style="margin-bottom:.25rem;">Datum auswählen</div>
+            <input id="datePicker" type="date" />
+          </div>
+          <button class="btn primary" id="saveBtn">Tag speichern</button>
+          <button class="btn" id="newTodayBtn" title="Wechselt zurück auf heute">Heute</button>
+          <div class="badge">Offline · localStorage</div>
+        </div>
       </div>
-      <div class="badge">Safari-ready</div>
+
+      <!-- Quick Overview -->
+      <div class="grid-2">
+
+        <!-- Habits + Progress -->
+        <div class="card habits">
+          <div class="row">
+            <h2>Gewohnheiten</h2>
+            <div class="pill" id="overallPill">Heute: 0/0</div>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="small">Gesamt-Fortschritt heute</div>
+            <div class="bar"><div class="fill" id="overallFill"></div></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div id="habitsList"></div>
+
+          <div class="divider"></div>
+
+          <div class="grid-2">
+            <div>
+              <div class="small">Letzte 7 Tage (alle Habits)</div>
+              <div class="bar"><div class="fill green" id="weekFill"></div></div>
+              <div class="small" id="weekText" style="margin-top:.25rem;">—</div>
+            </div>
+            <div>
+              <div class="small">Streak (alle Habits)</div>
+              <div class="bar"><div class="fill green" id="streakFill"></div></div>
+              <div class="small" id="streakText" style="margin-top:.25rem;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book -->
+        <div class="card">
+          <h2>AKTUELLES BUCH</h2>
+          <h3 style="margin:0.25rem 0 0.5rem 0; font-size:1.2rem; letter-spacing:0.05em;">
+            JEDEN TAG EINEN SCHRITT
+          </h3>
+          <textarea id="bookNotes" placeholder="Gedanken, Erkenntnisse, Zitate"></textarea>
+        </div>
+      </div>
+
+      <!-- Reflection: 3 separate compartments -->
+      <div class="grid-3">
+
+        <div class="card physisch">
+          <h2>💪 Physisch</h2>
+          <div class="section">
+            <div class="small">Energie (1–10)</div>
+            <input id="energy" placeholder="z.B. 7" inputmode="numeric" />
+          </div>
+          <div class="section">
+            <div class="small">Körpergefühl / Bewegung / Schlaf</div>
+            <textarea id="physicalNotes" placeholder="Kurz & ehrlich"></textarea>
+          </div>
+        </div>
+
+        <div class="card psychisch">
+          <h2>💜 Psychisch</h2>
+          <div class="section">
+            <div class="small">Emotionen & innere Stimmung</div>
+            <textarea id="moodNotes" placeholder="Was war heute präsent?"></textarea>
+          </div>
+          <div class="section">
+            <div class="small">Trigger / Dankbarkeit (optional)</div>
+            <textarea id="moodExtra" placeholder="1–2 Zeilen reichen"></textarea>
+          </div>
+        </div>
+
+        <div class="card mental">
+          <h2>🧠 Mental</h2>
+          <div class="section">
+            <div class="small">Fokus (1–10)</div>
+            <input id="focus" placeholder="z.B. 6" inputmode="numeric" />
+          </div>
+          <div class="section">
+            <div class="small">Gedanken / Klarheit / Loslassen</div>
+            <textarea id="mentalNotes" placeholder="Was nimmst du mit?"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footer">Built for dich · Offline nutzbar · Erweiterbar 🚀</div>
     </div>
 
-    <!-- Quick Overview -->
-    <div class="grid-2">
-      <div class="card habits">
-        <h2>Gewohnheiten</h2>
-        <label><input type="checkbox" /> Kalte Dusche</label><br />
-        <label><input type="checkbox" /> Proteinziel</label><br />
-        <label><input type="checkbox" /> Wenig Zucker</label><br />
-        <label><input type="checkbox" /> Skincare</label><br />
-        <label><input type="checkbox" /> 3L Wasser</label><br />
-        <label><input type="checkbox" /> Supplements</label><br />
-        <label><input type="checkbox" /> Sport Einheit</label><br />
-        <label><input type="checkbox" /> Keine unnötige Ausgabe</label><br />
-        <label><input type="checkbox" /> 8h Schlaf</label>
+    <!-- RIGHT: History / Saved Days -->
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+
+      <div class="card">
+        <div class="row">
+          <h2>📅 Gespeicherte Tage</h2>
+          <button class="btn" id="exportBtn" title="Exportiert deine Daten als JSON-Datei">Export</button>
+        </div>
+        <div class="muted" style="margin-top:.25rem;">
+          Klicke auf einen Tag, um ihn zu laden. Alles wird lokal im Browser gespeichert.
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="history-list" id="historyList">
+          <div class="muted">Noch keine gespeicherten Tage.</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <button class="btn" id="clearAllBtn" title="Löscht alle gespeicherten Tage (irreversibel)">Alles löschen</button>
       </div>
 
       <div class="card">
-        <h2>AKTUELLES BUCH</h2>
-        <h3 style="margin:0.25rem 0 0.5rem 0; font-size:1.2rem; letter-spacing:0.05em;">JEDEN TAG EINEN SCHRITT</h3>
-        <textarea placeholder="Gedanken, Erkenntnisse, Zitate"></textarea>
+        <h2>🧾 Tages-Summary</h2>
+        <div class="muted" id="summaryText">Speichere einen Tag, um hier eine Zusammenfassung zu sehen.</div>
+        <div class="divider"></div>
+        <div class="small" id="summaryDetails">—</div>
       </div>
+
     </div>
-
-    <!-- Evening Reflection -->
-    <div class="card">
-      <h2>🌙 Abend-Reflexion</h2>
-
-      <div class="section physisch">
-        <h3>Physisch</h3>
-        <input placeholder="Energie (1–10)" />
-        <textarea placeholder="Körpergefühl, Bewegung, Schlaf"></textarea>
-      </div>
-
-      <div class="section psychisch">
-        <h3>Psychisch</h3>
-        <textarea placeholder="Emotionen & innere Stimmung"></textarea>
-      </div>
-
-      <div class="section mental">
-        <h3>Mental</h3>
-        <input placeholder="Fokus (1–10)" />
-        <textarea placeholder="Gedanken, Klarheit, loslassen"></textarea>
-      </div>
-    </div>
-
-    <div class="footer">Built for dich · Offline nutzbar · Erweiterbar 🚀</div>
 
   </div>
+
+  <script>
+    // ---------- Config ----------
+    const STORAGE_KEY = "daily_dashboard_v1";
+
+    const HABITS = [
+      { id: "cold_shower", label: "Kalte Dusche" },
+      { id: "protein", label: "Proteinziel" },
+      { id: "low_sugar", label: "Wenig Zucker" },
+      { id: "skincare", label: "Skincare" },
+      { id: "water_3l", label: "3L Wasser" },
+      { id: "supplements", label: "Supplements" },
+      { id: "workout", label: "Sport Einheit" },
+      { id: "no_spend", label: "Keine unnötige Ausgabe" },
+      { id: "sleep_8h", label: "8h Schlaf" }
+    ];
+
+    // ---------- Helpers ----------
+    const $ = (id) => document.getElementById(id);
+
+    function isoDate(d){
+      // d: Date -> YYYY-MM-DD (local)
+      const year = d.getFullYear();
+      const month = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function addDays(dateISO, delta){
+      const d = new Date(dateISO + "T12:00:00"); // avoid DST edge at midnight
+      d.setDate(d.getDate() + delta);
+      return isoDate(d);
+    }
+
+    function prettyDate(dateISO){
+      const d = new Date(dateISO + "T12:00:00");
+      return d.toLocaleDateString("de-CH", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+    }
+
+    function loadAll(){
+      try{
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      }catch(e){
+        return {};
+      }
+    }
+
+    function saveAll(data){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function downloadJSON(filename, obj){
+      const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // ---------- State ----------
+    let currentDateISO = isoDate(new Date());
+
+    // ---------- UI Builders ----------
+    function renderHabits(){
+      const wrap = $("habitsList");
+      wrap.innerHTML = "";
+
+      HABITS.forEach(h => {
+        const row = document.createElement("div");
+        row.style.marginBottom = ".6rem";
+
+        row.innerHTML = `
+          <label style="justify-content:space-between; align-items:flex-start;">
+            <div style="display:flex; gap:.6rem; align-items:flex-start;">
+              <input type="checkbox" id="habit_${h.id}" />
+              <div>
+                <div>${h.label}</div>
+                <div class="small" id="habit_meta_${h.id}">Streak: — · 7T: —</div>
+              </div>
+            </div>
+          </label>
+          <div class="bar" style="margin-left:1.75rem; margin-top:.35rem;">
+            <div class="fill green" id="habit_fill_${h.id}" style="width:0%"></div>
+          </div>
+        `;
+        wrap.appendChild(row);
+
+        // bind change
+        const cb = document.getElementById(`habit_${h.id}`);
+        cb.addEventListener("change", () => {
+          updateComputedProgress();
+        });
+      });
+    }
+
+    // ---------- Data IO ----------
+    function collectForm(){
+      const habits = {};
+      HABITS.forEach(h => habits[h.id] = !!document.getElementById(`habit_${h.id}`).checked);
+
+      return {
+        date: currentDateISO,
+        habits,
+        bookNotes: $("bookNotes").value || "",
+        physisch: {
+          energy: $("energy").value || "",
+          notes: $("physicalNotes").value || ""
+        },
+        psychisch: {
+          notes: $("moodNotes").value || "",
+          extra: $("moodExtra").value || ""
+        },
+        mental: {
+          focus: $("focus").value || "",
+          notes: $("mentalNotes").value || ""
+        },
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function fillForm(entry){
+      // entry can be undefined -> clear
+      HABITS.forEach(h => {
+        document.getElementById(`habit_${h.id}`).checked = !!(entry && entry.habits && entry.habits[h.id]);
+      });
+
+      $("bookNotes").value = entry?.bookNotes || "";
+      $("energy").value = entry?.physisch?.energy || "";
+      $("physicalNotes").value = entry?.physisch?.notes || "";
+
+      $("moodNotes").value = entry?.psychisch?.notes || "";
+      $("moodExtra").value = entry?.psychisch?.extra || "";
+
+      $("focus").value = entry?.mental?.focus || "";
+      $("mentalNotes").value = entry?.mental?.notes || "";
+
+      updateComputedProgress();
+      renderSummary(entry);
+    }
+
+    function saveCurrentDay(){
+      const all = loadAll();
+      all[currentDateISO] = collectForm();
+      saveAll(all);
+      renderHistory();
+      updateComputedProgress();
+      renderSummary(all[currentDateISO]);
+      flashPill(`Gespeichert ✓`);
+    }
+
+    function loadDay(dateISO){
+      currentDateISO = dateISO;
+
+      $("datePicker").value = currentDateISO;
+      $("datePretty").textContent = prettyDate(currentDateISO);
+      $("dayKeyPill").textContent = currentDateISO;
+
+      const all = loadAll();
+      fillForm(all[currentDateISO]);
+
+      renderHistory(); // to show active item
+      updateComputedProgress();
+    }
+
+    function flashPill(text){
+      const el = $("dayKeyPill");
+      const prev = el.textContent;
+      el.textContent = text;
+      el.style.borderColor = "rgba(34,197,94,.5)";
+      setTimeout(() => {
+        el.textContent = currentDateISO;
+        el.style.borderColor = "var(--line)";
+      }, 900);
+    }
+
+    // ---------- Progress ----------
+    function habitStreak(all, habitId, endDateISO){
+      // consecutive days ending at endDateISO where habit true
+      let streak = 0;
+      for(let i=0; i<3650; i++){ // hard cap ~10 years
+        const d = addDays(endDateISO, -i);
+        const e = all[d];
+        if(e && e.habits && e.habits[habitId]) streak++;
+        else break;
+      }
+      return streak;
+    }
+
+    function habitRateLastNDays(all, habitId, endDateISO, n){
+      let done = 0;
+      for(let i=0; i<n; i++){
+        const d = addDays(endDateISO, -i);
+        const e = all[d];
+        if(e && e.habits && e.habits[habitId]) done++;
+      }
+      return { done, total: n, pct: Math.round((done / n) * 100) };
+    }
+
+    function overallForDate(entry){
+      if(!entry) return { done:0, total:HABITS.length, pct:0 };
+      let done = 0;
+      HABITS.forEach(h => { if(entry.habits?.[h.id]) done++; });
+      const pct = Math.round((done / HABITS.length) * 100);
+      return { done, total:HABITS.length, pct };
+    }
+
+    function overallStreakAllHabits(all, endDateISO){
+      // streak of "all habits completed" consecutive days ending at endDateISO
+      let streak = 0;
+      for(let i=0; i<3650; i++){
+        const d = addDays(endDateISO, -i);
+        const e = all[d];
+        const ok = e && overallForDate(e).done === HABITS.length;
+        if(ok) streak++;
+        else break;
+      }
+      return streak;
+    }
+
+    function overallRateLastNDaysAllHabits(all, endDateISO, n){
+      let done = 0;
+      for(let i=0; i<n; i++){
+        const d = addDays(endDateISO, -i);
+        const e = all[d];
+        if(e && overallForDate(e).done === HABITS.length) done++;
+      }
+      return { done, total:n, pct: Math.round((done/n)*100) };
+    }
+
+    function updateComputedProgress(){
+      const all = loadAll();
+      const entry = collectForm(); // current unsaved state still counts visually
+
+      // Today overall
+      const o = overallForDate(entry);
+      $("overallPill").textContent = `Heute: ${o.done}/${o.total}`;
+      $("overallFill").style.width = `${o.pct}%`;
+
+      // Per habit stats
+      HABITS.forEach(h => {
+        const streak = habitStreak(all, h.id, currentDateISO);
+        // if today checked but not saved yet, streak should reflect it.
+        // If unsaved and today checked but saved data missing/false, add 1 if yesterday had streak.
+        const todayChecked = !!entry.habits[h.id];
+        const savedToday = !!(all[currentDateISO]?.habits?.[h.id]);
+        let liveStreak = streak;
+        if(todayChecked && !savedToday){
+          const y = addDays(currentDateISO, -1);
+          const yOk = !!(all[y]?.habits?.[h.id]);
+          liveStreak = yOk ? habitStreak(all, h.id, y) + 1 : 1;
+        }
+        if(!todayChecked && savedToday){
+          // user unchecked but saved says true -> keep streak from saved data (they can re-save)
+          liveStreak = streak;
+        }
+
+        const rate7 = habitRateLastNDays(all, h.id, currentDateISO, 7);
+        const meta = document.getElementById(`habit_meta_${h.id}`);
+        meta.textContent = `Streak: ${liveStreak} · 7T: ${rate7.pct}%`;
+        document.getElementById(`habit_fill_${h.id}`).style.width = `${rate7.pct}%`;
+      });
+
+      // Overall 7d all-habits
+      const week = overallRateLastNDaysAllHabits(all, currentDateISO, 7);
+      $("weekFill").style.width = `${week.pct}%`;
+      $("weekText").textContent = `${week.done}/${week.total} Tage komplett · ${week.pct}%`;
+
+      // Overall streak all-habits
+      const s = overallStreakAllHabits(all, currentDateISO);
+      const sPct = Math.min(100, s * 10); // visual scale: 10% per day, cap 100
+      $("streakFill").style.width = `${sPct}%`;
+      $("streakText").textContent = `${s} Tage in Folge komplett`;
+    }
+
+    // ---------- History ----------
+    function renderHistory(){
+      const all = loadAll();
+      const keys = Object.keys(all).sort((a,b) => (a < b ? 1 : -1)); // newest first
+      const list = $("historyList");
+      list.innerHTML = "";
+
+      if(keys.length === 0){
+        list.innerHTML = `<div class="muted">Noch keine gespeicherten Tage.</div>`;
+        return;
+      }
+
+      keys.forEach(k => {
+        const e = all[k];
+        const o = overallForDate(e);
+        const item = document.createElement("div");
+        item.className = "history-item" + (k === currentDateISO ? " active" : "");
+        item.innerHTML = `
+          <div class="history-meta">
+            <div>
+              <div style="font-weight:600;">${prettyDate(k)}</div>
+              <div class="small">${k}</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="pill">${o.done}/${o.total}</div>
+              <div class="small">${o.pct}%</div>
+            </div>
+          </div>
+        `;
+        item.addEventListener("click", () => loadDay(k));
+        list.appendChild(item);
+      });
+    }
+
+    // ---------- Summary ----------
+    function renderSummary(entry){
+      if(!entry){
+        $("summaryText").textContent = "Noch nichts für diesen Tag gespeichert.";
+        $("summaryDetails").textContent = "—";
+        return;
+      }
+
+      const o = overallForDate(entry);
+      $("summaryText").textContent = `${prettyDate(entry.date)} · Gewohnheiten: ${o.done}/${o.total} (${o.pct}%)`;
+
+      const energy = entry.physisch?.energy ? `Energie: ${entry.physisch.energy}/10` : "Energie: —";
+      const focus = entry.mental?.focus ? `Fokus: ${entry.mental.focus}/10` : "Fokus: —";
+
+      const notesBits = [];
+      const p = (entry.physisch?.notes || "").trim();
+      const y = (entry.psychisch?.notes || "").trim();
+      const m = (entry.mental?.notes || "").trim();
+      if(p) notesBits.push("Physisch ✓");
+      if(y) notesBits.push("Psychisch ✓");
+      if(m) notesBits.push("Mental ✓");
+
+      $("summaryDetails").textContent =
+        `${energy} · ${focus} · Notizen: ${notesBits.length ? notesBits.join(", ") : "—"}`;
+    }
+
+    // ---------- Init & Events ----------
+    function init(){
+      renderHabits();
+
+      // date init
+      $("datePicker").value = currentDateISO;
+      $("datePretty").textContent = prettyDate(currentDateISO);
+      $("dayKeyPill").textContent = currentDateISO;
+
+      // load today's saved if exists
+      const all = loadAll();
+      fillForm(all[currentDateISO]);
+
+      // events
+      $("datePicker").addEventListener("change", (e) => {
+        const v = e.target.value;
+        if(v) loadDay(v);
+      });
+
+      $("saveBtn").addEventListener("click", saveCurrentDay);
+      $("newTodayBtn").addEventListener("click", () => loadDay(isoDate(new Date())));
+
+      // export
+      $("exportBtn").addEventListener("click", () => {
+        const data = loadAll();
+        downloadJSON(`daily_dashboard_export_${isoDate(new Date())}.json`, data);
+      });
+
+      // clear all
+      $("clearAllBtn").addEventListener("click", () => {
+        const ok = confirm("Wirklich ALLE gespeicherten Tage löschen? Das kann nicht rückgängig gemacht werden.");
+        if(!ok) return;
+        localStorage.removeItem(STORAGE_KEY);
+        renderHistory();
+        fillForm(undefined);
+        updateComputedProgress();
+      });
+
+      // live progress updates while typing (optional but nice)
+      ["bookNotes","energy","physicalNotes","moodNotes","moodExtra","focus","mentalNotes"].forEach(id => {
+        $(id).addEventListener("input", () => {
+          // keep progress visual up-to-date (esp. overall pill/bar)
+          updateComputedProgress();
+        });
+      });
+
+      renderHistory();
+      updateComputedProgress();
+    }
+
+    init();
+  </script>
 </body>
 </html>
